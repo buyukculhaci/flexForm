@@ -1,5 +1,5 @@
-function veriGet(action, controller, data = {}, page = "TanımlanmamışGet", reachType="name") {
-    var ret;
+function veriGet(controller, action, data = {}, page = "TanımlanmamışGet", by = "name", test = false) {
+
     $.ajax({
         type: "POST",
         url: '/' + controller + '/' + action,
@@ -7,14 +7,24 @@ function veriGet(action, controller, data = {}, page = "TanımlanmamışGet", re
         async: false,
         dataType: 'json',
         success: function (data) {
-            console.log(data);
+            if (test) {
+                console.log('** Form Verisi **');
+                console.log(data);
+            }
 
             if (data.multi != undefined) {
-                ret = data.multi;
+                return data.multi;
             }
             else {
                 Object.keys(data.single).forEach(itm => {
-                    $('[name="' + itm + '"]').val(data.single[itm]);
+                    console.log(data.single[itm]);
+                    if (by == 'id') {
+                        $('[name="' + itm + '"]').val(data.single[itm]);
+                    }
+                    else {
+                        $('[id="' + itm + '"]').val(data.single[itm]);
+                    }
+
                 });
             }
         },
@@ -25,10 +35,9 @@ function veriGet(action, controller, data = {}, page = "TanımlanmamışGet", re
             console.log(err);
         }
     });
-    return ret;
 }
 
-function veriSet(action, controller, data, page = "TanımlanmamışSet", toastTitle = '') {
+function veriSet(controller, action, data, page = "TanımlanmamışSet", toastTitle = '') {
     let res = {
         result: false,
         data: '',
